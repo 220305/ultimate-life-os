@@ -119,7 +119,9 @@ def jalankan_ai_asisten(konteks_user, pertanyaan_user):
         return "⚠️ Mohon masukkan Gemini API Key Anda terlebih dahulu di dalam kode!"
     
     try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
+        from google.genai import errors
+client = genai.Client(api_key=GEMINI_API_KEY, http_options={'headers': {'Authorization': f'Bearer {GEMINI_API_KEY}'}})
+
         prompt_sistem = (
             "Anda adalah BERCOM, Manajer Eksekutif AI dan Asisten Pribadi cerdas untuk Life OS pengguna.\n"
             "Anda memiliki akses otonom untuk menggunakan fungsi keuangan, proyek, dan inbox.\n"
