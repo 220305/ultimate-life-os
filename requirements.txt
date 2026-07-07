@@ -1,5 +1,5 @@
 ﻿streamlit
-google-genai
+google-generativeai
 plotly
 youtube-transcript-api
 streamlit-mic-recorder
