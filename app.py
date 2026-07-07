@@ -136,8 +136,6 @@ def jalankan_ai_asisten(konteks_user, pertanyaan_user):
             ],
             config=config
         )
-
-        )
         return respons_final.text
 
     except Exception as e:
