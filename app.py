@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 from datetime import datetime
+from google import genai       # Pastikan baris ini ada
+from google.genai import types # Pastikan baris ini ada
 import plotly.express as px
-import google.generativeai as genai
-from google.generativeai import types
 
 
 # 1. KONFIGURASI AI
