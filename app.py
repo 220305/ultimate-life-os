@@ -10,6 +10,7 @@ import plotly.express as px
 # 1. KONFIGURASI AI
 GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY, http_options={'headers': {'Authorization': f'Bearer {GEMINI_API_KEY}'}})
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 
@@ -120,7 +121,6 @@ def jalankan_ai_asisten(konteks_user, pertanyaan_user):
     
     try:
         from google.genai import errors
-client = genai.Client(api_key=GEMINI_API_KEY, http_options={'headers': {'Authorization': f'Bearer {GEMINI_API_KEY}'}})
 
         prompt_sistem = (
             "Anda adalah BERCOM, Manajer Eksekutif AI dan Asisten Pribadi cerdas untuk Life OS pengguna.\n"
