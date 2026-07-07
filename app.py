@@ -2,17 +2,13 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 from datetime import datetime
-from google import genai
-from google.genai import types
 import plotly.express as px
+import google.generativeai as genai
+from google.generativeai import types
 
 
 # 1. KONFIGURASI AI
 GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
-genai.configure(api_key=GEMINI_API_KEY)
-client = genai.Client(api_key=GEMINI_API_KEY, http_options={'headers': {'Authorization': f'Bearer {GEMINI_API_KEY}'}})
-model = genai.GenerativeModel("gemini-1.5-flash")
-
 
 # 2. KONEKSI DATABASE & PEMBUATAN TABEL
 conn = sqlite3.connect('life_os.db', check_same_thread=False)
@@ -117,49 +113,33 @@ def catat_keuangan_otomatis(tipe: str, kategori: str, jumlah: int, keterangan: s
 
 def jalankan_ai_asisten(konteks_user, pertanyaan_user):
     if GEMINI_API_KEY == "ISI_API_KEY_GEMINI_ANDA_DI_SINI":
-        return "⚠️ Mohon masukkan Gemini API Key Anda terlebih dahulu di dalam kode!"
-    
-    try:
-        from google.genai import errors
+        return "Mohon masukkan Gemini API Key Anda terlebih dahulu di dalam kode!"
 
-        prompt_sistem = (
+    try:
+        prompt_system = (
             "Anda adalah BERCOM, Manajer Eksekutif AI dan Asisten Pribadi cerdas untuk Life OS pengguna.\n"
-            "Anda memiliki akses otonom untuk menggunakan fungsi keuangan, proyek, dan inbox.\n"
+            "Anda memiliki akses otonom untuk merekomendasikan fungsi keuangan, proyek, dan inbox.\n"
             "Jika pengguna menyebutkan nominal transaksi, langsung panggil fungsi 'catat_keuangan_otomatis'.\n"
-            "Gunakan bahasa Indonesia yang santai, ringkas, panggil pengguna Anda dengan sebutan 'Bos' atau 'Master', "
+            "Gunakan bahasa Indonesia yang santai, ringkas, panggil pengguna Anda dengan sebutan 'Bos' atau 'Master'\n"
             "dan selalu konfirmasikan angka dengan format Rp."
         )
 
-        input_lengkap = f"{prompt_sistem}\n\n[DATA LIFE OS PENGGUNA SAAT INI]:\n{konteks_user}\n\n[PERINTAH]:\n{pertanyaan_user}"
-        daftar_tools = [tambah_proyek_otomatis, tambah_inbox_otomatis, catat_keuangan_otomatis, rangkum_video_youtube]
+        input_lengkap = f"{prompt_system}\n\n[DATA LIFE OS PENGGUNA SAAT INI]:\n{konteks_user}\n\n[PERINTAH]:\n{pertanyaan_user}"
+        daftar_tools = [tambah_proyek_otomatis, tambah_inbox_otomatis, rangkum_video_youtube, catat_keuangan_otomatis]
         config = types.GenerateContentConfig(tools=daftar_tools, temperature=0.4)
-        response = client.models.generate_content(model='gemini-2.5-flash', contents=input_lengkap, config=config)
         
-        if response.function_calls:
-            for call in response.function_calls:
-                nama_fungsi = call.name
-                argumen = call.args
-                if nama_fungsi == "catat_keuangan_otomatis":
-                    hasil_aksi = catat_keuangan_otomatis(argumen['tipe'], argumen['kategori'], int(argumen['jumlah']), argumen['keterangan'])
-                elif nama_fungsi == "tambah_proyek_otomatis":
-                    hasil_aksi = tambah_proyek_otomatis(argumen['nama_proyek'], argumen['tenggat_waktu'])
-                elif nama_fungsi == "tambah_inbox_otomatis":
-                    hasil_aksi = tambah_inbox_otomatis(argumen['isi_catatan'])
-                elif nama_fungsi == "rangkum_video_youtube":
-                    hasil_aksi = rangkum_video_youtube(argumen['url_video'])
-                else:
-                    hasil_aksi = "Fungsi tidak dikenali."
+        respons_final = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[
+                types.Content(role="user", parts=[types.Part.from_text(text=input_lengkap)]),
+                types.Content(role="user", parts=[types.Part.from_text(text=f"[HASIL SISTEM]: {hasil_aksi}")])
+            ],
+            config=config
+        )
+        return respons_final.text
 
-                respons_final = client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=[
-                        types.Content(role="user", parts=[types.Part.from_text(text=input_lengkap)]),
-                        response.candidates.content,
-                        types.Content(role="user", parts=[types.Part.from_text(text=f"[HASIL SISTEM]: {hasil_aksi}")])
-                    ], config=config
-                )
-                return respons_final.text
-   except Exception as e: return f"Terjadi kesalahan pada sistem AI: {str(e)}"
+    except Exception as e:
+        return f"Terjadi kesalahan pada sistem AI: {str(e)}"
 
 # =====================================================================
 # 🖥️ ANTARMUKA WEB STREAMLIT (DASBOR INTERAKTIF)
