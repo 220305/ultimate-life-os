@@ -8,7 +8,7 @@ import plotly.express as px
 
 
 # 1. KONFIGURASI AI
-GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+GEMINI_API_KEY = st.secrets["AQ.Ab8RN6JGyIOUcxKvvqsnuLSaq2WfsSjcckC2fF4U9hBDPOsXug"]
 
 # 2. KONEKSI DATABASE & PEMBUATAN TABEL
 conn = sqlite3.connect('life_os.db', check_same_thread=False)
