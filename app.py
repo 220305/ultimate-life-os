@@ -132,10 +132,11 @@ def jalankan_ai_asisten(konteks_user, pertanyaan_user):
         respons_final = client.models.generate_content(
             model='gemini-2.5-flash',
             contents=[
-                types.Content(role="user", parts=[types.Part.from_text(text=input_lengkap)]),
-                types.Content(role="user", parts=[types.Part.from_text(text=f"[HASIL SISTEM]: {hasil_aksi}")])
+                types.Content(role="user", parts=[types.Part.from_text(text=input_lengkap)])
             ],
             config=config
+        )
+
         )
         return respons_final.text
 
