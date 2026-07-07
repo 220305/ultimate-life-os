@@ -9,6 +9,9 @@ from google.generativeai import types
 
 # 1. KONFIGURASI AI
 GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel("gemini-1.5-flash")
+
 
 # 2. KONEKSI DATABASE & PEMBUATAN TABEL
 conn = sqlite3.connect('life_os.db', check_same_thread=False)
