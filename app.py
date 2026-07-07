@@ -159,8 +159,7 @@ client = genai.Client(api_key=GEMINI_API_KEY, http_options={'headers': {'Authori
                     ], config=config
                 )
                 return respons_final.text
-                return response.text
-    except Exception as e: return f"Terjadi kesalahan pada sistem AI: {str(e)}"
+   except Exception as e: return f"Terjadi kesalahan pada sistem AI: {str(e)}"
 
 # =====================================================================
 # 🖥️ ANTARMUKA WEB STREAMLIT (DASBOR INTERAKTIF)
