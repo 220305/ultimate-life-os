@@ -340,3 +340,8 @@ if st.sidebar.button("🚨 Reset Semua Data", help="Klik untuk mengosongkan selu
     conn.commit()
     st.sidebar.success("Database berhasil dikosongkan!")
     st.rerun()
+# --- TOMBOL PROMOSI JUALAN TEMPLATE ---
+st.sidebar.markdown("---")
+st.sidebar.subheader("🚀 Miliki Aplikasi Ini Sekarang!")
+st.sidebar.write("Ingin punya asisten AI pribadi seperti ini di laptop Anda sendiri? Dapatkan source code dan template lengkapnya.")
+st.sidebar.link_button("🛍️ Beli Template Proyek (Rp 49.000)", "https://karyakarsa.com")
