@@ -283,7 +283,7 @@ elif pilihan == "💬 Obrolan AI Asisten":
         # 2. Minta AI mengeksekusi fungsi otonom berdasarkan teks tersebut
         with st.chat_message("assistant"):
             with st.spinner("Menjalankan tugas otonom..."):
-            jawaban = jalankan_ai_asisten(konteks_life_os, prompt_aktif)
+                        jawaban = jalankan_ai_asisten(konteks_life_os, prompt_aktif)
             st.markdown(jawaban)
             st.session_state.messages.append({"role": "assistant", "content": jawaban})
             
