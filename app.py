@@ -299,6 +299,11 @@ elif pilihan == "💬 Obrolan AI Asisten":
         # Bersihkan keadaan dan segarkan halaman
         st.rerun()
 
+# --- PEMUTAR AUDIO OTOMATIS SETELAH RERUN ---
+if "audio_output" in st.session_state and st.session_state.audio_output is not None:
+    st.audio(st.session_state.audio_output, format="audio/mp3", autoplay=True)
+    # Hapus data setelah diputar agar tidak berbunyi berulang-ulang saat klik menu lain
+    st.session_state.audio_output = None 
 
 # --- FITUR 3: JURNAL KEUANGAN MANUAL ---
 elif pilihan == "💰 Jurnal Keuangan":
