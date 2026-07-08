@@ -119,7 +119,7 @@ def jalankan_ai_asisten(konteks_user, pertanyaan_user):
     try:
         client = genai.Client(api_key=GEMINI_API_KEY)
         prompt_system = (
-            "Anda adalah BERCOM, Manajer Eksekutif AI dan Asisten Pribadi cerdas untuk Life OS pengguna.\n"
+            "Anda adalah AERO, Manajer Eksekutif AI dan Asisten Pribadi cerdas untuk Life OS pengguna.\n"
             "Anda memiliki akses otonom untuk merekomendasikan fungsi keuangan, proyek, dan inbox.\n"
             "Jika pengguna menyebutkan nominal transaksi, langsung panggil fungsi 'catat_keuangan_otomatis'.\n"
             "Gunakan bahasa Indonesia yang santai, ringkas, panggil pengguna Anda dengan sebutan 'Bos' atau 'Master'\n"
