@@ -283,23 +283,22 @@ elif pilihan == "💬 Obrolan AI Asisten":
         # 2. Minta AI mengeksekusi fungsi otonom berdasarkan teks tersebut
         with st.chat_message("assistant"):
             with st.spinner("Menjalankan tugas otonom..."):
-                           jawaban = jalankan_ai_asisten(konteks_life_os, prompt_aktif)
+            jawaban = jalankan_ai_asisten(konteks_life_os, prompt_aktif)
             st.markdown(jawaban)
+            st.session_state.messages.append({"role": "assistant", "content": jawaban})
             
-            # --- TAMBAHKAN KODE SUARA AI DI SINI (Mulai Baris 288) ---
+            # --- PROSES SUARA DAN SIMPAN KE SESSION STATE ---
             if jawaban:
                 from gtts import gTTS
                 import io
                 tts = gTTS(text=jawaban, lang='id', slow=False)
                 fp = io.BytesIO()
                 tts.write_to_fp(fp)
-                fp.seek(0)
-                st.audio(fp, format="audio/mp3", autoplay=True)
-            
-            st.session_state.messages.append({"role": "assistant", "content": jawaban})
+                st.session_state.audio_output = fp.getvalue() # Simpan data audio mentah
 
-        # Bersihkan keadaan dan segarkan halaman agar tampilan sinkron
+        # Bersihkan keadaan dan segarkan halaman
         st.rerun()
+
 
 # --- FITUR 3: JURNAL KEUANGAN MANUAL ---
 elif pilihan == "💰 Jurnal Keuangan":
