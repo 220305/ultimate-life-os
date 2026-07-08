@@ -5,7 +5,8 @@ from datetime import datetime
 from google import genai       # Pastikan baris ini ada
 from google.genai import types # Pastikan baris ini ada
 import plotly.express as px
-
+from gtts import gTTS
+import io
 
 # 1. KONFIGURASI AI
 GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
@@ -282,13 +283,23 @@ elif pilihan == "💬 Obrolan AI Asisten":
         # 2. Minta AI mengeksekusi fungsi otonom berdasarkan teks tersebut
         with st.chat_message("assistant"):
             with st.spinner("Menjalankan tugas otonom..."):
-                jawaban = jalankan_ai_asisten(konteks_life_os, prompt_aktif)
-                st.markdown(jawaban)
-        st.session_state.messages.append({"role": "assistant", "content": jawaban})
-        
-        # Bersihkan state dan segarkan halaman agar tampilan sinkron
-        st.rerun()
+                           jawaban = jalankan_ai_asisten(konteks_life_os, prompt_aktif)
+            st.markdown(jawaban)
+            
+            # --- TAMBAHKAN KODE SUARA AI DI SINI (Mulai Baris 288) ---
+            if jawaban:
+                from gtts import gTTS
+                import io
+                tts = gTTS(text=jawaban, lang='id', slow=False)
+                fp = io.BytesIO()
+                tts.write_to_fp(fp)
+                fp.seek(0)
+                st.audio(fp, format="audio/mp3", autoplay=True)
+            
+            st.session_state.messages.append({"role": "assistant", "content": jawaban})
 
+        # Bersihkan keadaan dan segarkan halaman agar tampilan sinkron
+        st.rerun()
 
 # --- FITUR 3: JURNAL KEUANGAN MANUAL ---
 elif pilihan == "💰 Jurnal Keuangan":
