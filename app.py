@@ -4,6 +4,7 @@ import sqlite3
 from datetime import datetime
 from google import genai       # Pastikan baris ini ada
 from google.genai import types # Pastikan baris ini ada
+from google.genai.errors import APIError  # Tambahkan baris ini
 import plotly.express as px
 from gtts import gTTS
 import io
@@ -113,23 +114,21 @@ def catat_keuangan_otomatis(tipe: str, kategori: str, jumlah: int, keterangan: s
 # =====================================================================
 
 def jalankan_ai_asisten(konteks_user, pertanyaan_user):
-    if GEMINI_API_KEY == "ISI_API_KEY_GEMINI_ANDA_DI_SINI":
-        return "Mohon masukkan Gemini API Key Anda terlebih dahulu di dalam kode!"
-
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    
+    prompt_system = (
+        "Anda adalah BEE, Manajer Eksekutif AI dan Asisten Pribadi cerdas untuk Life OS pengguna.\n"
+        "Anda memiliki akses otonom untuk merekomendasikan fungsi keuangan, proyek, dan inbox.\n"
+        "Jika pengguna menyebutkan nominal transaksi, langsung panggil fungsi 'catat_keuangan_otomatis'.\n"
+        "Gunakan bahasa Indonesia yang santai, ringkas, panggil pengguna Anda dengan sebutan 'Bos' "
+        "dan selalu konfirmasikan angka dengan format Rp."
+    )
+    
+    input_lengkap = f"{prompt_system}\n\n[DATA LIFE OS PENGGUNA SAAT INI]:\n{konteks_user}\n\n[PERINTAH]:\n{pertanyaan_user}"
+    daftar_tools = [tambah_proyek_otomatis, tambah_inbox_otomatis, rangkum_video_youtube, catat_keuangan_otomatis]
+    config = types.GenerateContentConfig(tools=daftar_tools, temperature=0.4)
+    
     try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        prompt_system = (
-            "Anda adalah AERO, Manajer Eksekutif AI dan Asisten Pribadi cerdas untuk Life OS pengguna.\n"
-            "Anda memiliki akses otonom untuk merekomendasikan fungsi keuangan, proyek, dan inbox.\n"
-            "Jika pengguna menyebutkan nominal transaksi, langsung panggil fungsi 'catat_keuangan_otomatis'.\n"
-            "Gunakan bahasa Indonesia yang santai, ringkas, panggil pengguna Anda dengan sebutan 'Bos' atau 'Master'\n"
-            "dan selalu konfirmasikan angka dengan format Rp."
-        )
-
-        input_lengkap = f"{prompt_system}\n\n[DATA LIFE OS PENGGUNA SAAT INI]:\n{konteks_user}\n\n[PERINTAH]:\n{pertanyaan_user}"
-        daftar_tools = [tambah_proyek_otomatis, tambah_inbox_otomatis, rangkum_video_youtube, catat_keuangan_otomatis]
-        config = types.GenerateContentConfig(tools=daftar_tools, temperature=0.4)
-        
         respons_final = client.models.generate_content(
             model='gemini-2.5-flash',
             contents=[
@@ -139,8 +138,14 @@ def jalankan_ai_asisten(konteks_user, pertanyaan_user):
         )
         return respons_final.text
 
+    except APIError as e:
+        if e.code == 429:
+            return "⚠️ Kuota API gratis sedang penuh atau Anda mengirim pesan terlalu cepat. Silakan tunggu sekitar 1 menit lalu coba lagi ya, Bos."
+        else:
+            return f"❌ Terjadi kesalahan pada server AI Gemini: {e.message}"
+            
     except Exception as e:
-        return f"Terjadi kesalahan pada sistem AI: {str(e)}"
+        return f"❌ Terjadi kesalahan pada sistem AI: {str(e)}"
 
 # =====================================================================
 # 🖥️ ANTARMUKA WEB STREAMLIT (DASBOR INTERAKTIF)
