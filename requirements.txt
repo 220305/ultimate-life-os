@@ -4,3 +4,4 @@ plotly
 youtube-transcript-api
 streamlit-mic-recorder
 gTTS
+openpyxl
