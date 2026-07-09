@@ -15,6 +15,23 @@ GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 # 2. KONEKSI DATABASE & PEMBUATAN TABEL
 conn = sqlite3.connect('life_os.db', check_same_thread=False)
 c = conn.cursor()
+def ekspor_keuangan_ke_excel():
+    # Mengambil seluruh data dari tabel keuangan Anda
+    c.execute("SELECT tipe, kategori, jumlah, tanggal, keterangan FROM keuangan")
+    data_keuangan = c.fetchall()
+    
+    if data_keuangan:
+        # Menentukan nama kolom di file Excel nanti
+        kolom = ["Tipe Transaksi", "Kategori", "Jumlah (Rp)", "Tanggal", "Keterangan"]
+        df = pd.DataFrame(data_keuangan, columns=kolom)
+        
+        # Mengonversi DataFrame menjadi format file Excel di dalam memori
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Laporan Keuangan')
+        
+        return buffer.getvalue()
+    return None
 
 c.execute('''CREATE TABLE IF NOT EXISTS inbox (id INTEGER PRIMARY KEY, isi TEXT, tanggal TEXT)''')
 c.execute('''CREATE TABLE IF NOT EXISTS proyek (id INTEGER PRIMARY KEY, nama TEXT, tenggat TEXT, status TEXT)''')
@@ -328,6 +345,16 @@ elif pilihan == "💰 Jurnal Keuangan":
     with col_f2:
         st.markdown("### Histori Lengkap Buku Besar")
         st.dataframe(df_keuangan.sort_values(by="id", ascending=False), use_container_width=True)
+        st.write("") # Memberikan jarak spasi vertikal kosong
+        file_excel_siap = ekspor_keuangan_ke_excel()
+        
+        if file_excel_siap:
+            st.download_button(
+                label="📥 Unduh Catatan Keuangan (Excel)",
+                data=file_excel_siap,
+                file_name="Catatan_Keuangan_LifeOS.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
 
 # --- FITUR 4: DATABASE PROYEK ---
 elif pilihan == "🗂️ PARA: Proyek":
